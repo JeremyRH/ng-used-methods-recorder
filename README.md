@@ -9,7 +9,10 @@ Go to any web page using AngularJS and React and click on things, navigate aroun
 Open the browser console and type `getUsedNgMethods()` to see the data.
 
 ## Copy output as JSON
-You can copy the JSON output by pasting this into your browser console: `copy(JSON.stringify(getUsedNgMethods(), null, 2))`
+You can copy the JSON output by pasting this into your browser console:
+```js
+copy(JSON.stringify(getUsedNgMethods(), null, 2));
+```
 
 ## Understanding the output
 ```json
