@@ -1,12 +1,12 @@
 {
   "manifest_version": 2,
-  "name": "Used AngularJS functions recorder",
-  "description": "Records AngularJS functions used in react components",
+  "name": "Used AngularJS methods recorder",
+  "description": "Records AngularJS methods used in react components",
   "version": "0.1",
   "permissions": [],
   "content_scripts": [
     {
-      "js": ["getUsedNgFunctions.js"],
+      "js": ["getUsedNgMethods.js"],
       "matches": [
         "https://*/*"
       ],

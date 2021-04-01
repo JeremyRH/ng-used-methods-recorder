@@ -1,21 +1,27 @@
 ## How to record
 Add the `extension` folder as an unpacked extension.
 Go to any web page using AngularJS and React and click on things, navigate around, do some stuff.
-When you're ready, open the browser console and type `getUsedNgFunctions()` to see all your React components using AngularJS methods.
+When you're ready, open the browser console and type `getUsedNgMethods()` to see all your React components using AngularJS methods.
 
 ## Understanding the output
-```js
+```json
 {
-  "<some-asset-url>:<line number>:<column number>": {
-    "<React component prop path>": "<AngularJS dependency path>"
+  "<DOM node containing the React component>": {
+    "propMap": {
+      "<React component prop path>": "<AngularJS dependency path>"
+    },
+    "renderCallstacks": ["<Snapshots of callstacks on ReactDOM.render()>"]
   }
 }
 ```
 Example:
-```js
+```json
 {
-  "https://example.com/cdn/my-react-component.js:22:55": {
-    "helpers.translate": "$locale.getString"
+  "<div id='adminsettingsView' class='ng-scope' />": {
+    "propMap": {
+      "helpers.translate": "$locale.getString"
+    },
+    "renderCallstacks": ["    at t.value (https://..."]
   }
 }
 ```

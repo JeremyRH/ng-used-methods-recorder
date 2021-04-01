@@ -79,15 +79,26 @@ function main() {
 	}
 
 	const ngFunctionProps = {};
-	const callLocationRegex = /patchedRender(?![^]*patchedRender).*\n.*\(([^)]+)/;
+	const callLocationRegex = /patchedRender(?![^]*patchedRender).*\n([^]+)/;
 
 	function patchRender(originalRender) {
-		return function patchedRender(element) {
-			const allNgFunctions = getNgFunctionDependencies();
-			const callLocation = callLocationRegex.exec(new Error().stack)?.[1];
+		return function patchedRender(element, node) {
+			if (node && element && typeof element.props === 'object') {
+				const allNgFunctions = getNgFunctionDependencies();
+				const renderCallstack = callLocationRegex.exec(new Error().stack)?.[1];
+				const nodeAttributes = Object.values(node.attributes).map(({ name, value }) =>
+					value ? `${name}=${JSON.stringify(value)}` : name
+				);
+				const nodeString = `<${node.nodeName.toLowerCase()} ${nodeAttributes.join(' ')} />`;
 
-			if (callLocation && element && typeof element.props === 'object') {
-				ngFunctionProps[callLocation] = ngFunctionProps[callLocation] || {};
+				const entry = (ngFunctionProps[nodeString] = ngFunctionProps[nodeString] || {
+					propMap: {},
+					renderCallstacks: [renderCallstack]
+				});
+
+				if (!entry.renderCallstacks.includes(renderCallstack)) {
+					entry.renderCallstacks.push(renderCallstack);
+				}
 
 				deepForEach({
 					root: element.props,
@@ -99,7 +110,7 @@ function main() {
 						const parent = keys.slice(0, -1).reduce((v, key) => v[key], element.props);
 						const key = keys[keys.length - 1];
 						parent[key] = function wrapped() {
-							ngFunctionProps[callLocation][propPath] = allNgFunctions.get(value);
+							entry.propMap[propPath] = allNgFunctions.get(value);
 							return this instanceof wrapped ? new value(...arguments) : value.apply(this, arguments);
 						};
 					},
@@ -124,7 +135,7 @@ function main() {
 		enumerable: true
 	});
 
-	window.getUsedNgFunctions = () => ngFunctionProps;
+	window.getUsedNgMethods = () => ngFunctionProps;
 }
 
 const script = document.createElement('script');
